@@ -237,12 +237,137 @@
     margin-top: 10px;
   }
 
+  .how-to-btn {
+    display: block;
+    margin: 14px auto 0;
+    background: none;
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(212,175,55,0.45);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .how-to-btn:hover { color: rgba(212,175,55,0.8); }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: #0f2d1e;
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 10px;
+    max-width: 540px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 32px;
+    position: relative;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .modal h2 {
+    font-family: 'Playfair Display', serif;
+    color: #d4af37;
+    font-size: 22px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 20px;
+    background: none;
+    border: none;
+    color: rgba(240,230,200,0.4);
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .modal-close:hover { color: #f0e6c8; }
+
+  .rule-section { margin-bottom: 20px; }
+  .rule-section h3 {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #d4af37;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(212,175,55,0.15);
+  }
+  .rule-section p {
+    font-size: 12px;
+    line-height: 1.8;
+    color: rgba(240,230,200,0.75);
+  }
+
+  .card-values {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .cv-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: rgba(240,230,200,0.75);
+    background: rgba(255,255,255,0.04);
+    border-radius: 4px;
+    padding: 5px 10px;
+  }
+  .cv-val { color: #d4af37; font-family: 'Playfair Display', serif; }
+
+  .action-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .action-table td {
+    font-size: 11px;
+    padding: 7px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: rgba(240,230,200,0.75);
+    vertical-align: top;
+  }
+  .action-table td:first-child {
+    color: #f0e6c8;
+    font-weight: 500;
+    white-space: nowrap;
+    width: 80px;
+  }
+
+  .payout-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .payout-table td {
+    font-size: 11px;
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: rgba(240,230,200,0.75);
+  }
+  .payout-table td:last-child { color: #7dffb3; text-align: right; font-family: 'Playfair Display', serif; }
+
   @media (max-width: 500px) {
     h1 { font-size: 26px; }
     .stats-bar { gap: 20px; }
     .card { width: 58px; height: 84px; }
     .card-rank { font-size: 16px; }
     .card-center { font-size: 24px; }
+    .modal { padding: 24px 18px; }
+    .card-values { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -303,6 +428,67 @@
     </div>
 
     <div class="hint" id="hint-text">Place your bet and deal to start</div>
+    <button class="how-to-btn" onclick="document.getElementById('howto').classList.add('open')">? How to Play</button>
+  </div>
+</div>
+
+<!-- How To Play Modal -->
+<div class="modal-overlay" id="howto" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('howto').classList.remove('open')">✕</button>
+    <h2>How to Play</h2>
+
+    <div class="rule-section">
+      <h3>The Goal</h3>
+      <p>Beat the dealer by getting a hand value closer to 21 without going over. If your total exceeds 21, you "bust" and lose automatically.</p>
+    </div>
+
+    <div class="rule-section">
+      <h3>Card Values</h3>
+      <div class="card-values">
+        <div class="cv-row"><span>2 – 10</span><span class="cv-val">Face value</span></div>
+        <div class="cv-row"><span>J, Q, K</span><span class="cv-val">10</span></div>
+        <div class="cv-row"><span>Ace</span><span class="cv-val">1 or 11</span></div>
+        <div class="cv-row"><span>Suits</span><span class="cv-val">Don't matter</span></div>
+      </div>
+    </div>
+
+    <div class="rule-section">
+      <h3>How a Round Works</h3>
+      <p>1. Place your bet using the chip buttons, then click <strong>Deal</strong>.<br>
+      2. You get 2 cards face-up. The dealer gets 2 cards — one face-up, one hidden.<br>
+      3. Choose your action. The dealer then reveals their hidden card and plays.<br>
+      4. Whoever is closer to 21 (without busting) wins.</p>
+    </div>
+
+    <div class="rule-section">
+      <h3>Your Actions</h3>
+      <table class="action-table">
+        <tr><td>Hit</td><td>Take another card. You can keep hitting until you stand or bust.</td></tr>
+        <tr><td>Stand</td><td>End your turn with your current hand.</td></tr>
+        <tr><td>Double</td><td>Double your bet and receive exactly one more card, then stand. Only available on your first two cards.</td></tr>
+      </table>
+    </div>
+
+    <div class="rule-section">
+      <h3>Dealer Rules</h3>
+      <p>The dealer must hit on any total of 16 or less, and must stand on 17 or higher. The dealer also hits on "soft 17" (an Ace + 6).</p>
+    </div>
+
+    <div class="rule-section">
+      <h3>Payouts</h3>
+      <table class="payout-table">
+        <tr><td>Win (beat the dealer)</td><td>2× your bet</td></tr>
+        <tr><td>Blackjack (Ace + 10-value on deal)</td><td>2.5× your bet</td></tr>
+        <tr><td>Push (tie with dealer)</td><td>Bet returned</td></tr>
+        <tr><td>Bust or dealer wins</td><td>Lose your bet</td></tr>
+      </table>
+    </div>
+
+    <div class="rule-section">
+      <h3>Tips</h3>
+      <p>Watch the strategy hint below the buttons — it shows the statistically best move based on your hand and the dealer's visible card. You start with $1,000 in chips, and the house will give you $500 if you run out!</p>
+    </div>
   </div>
 </div>
 
