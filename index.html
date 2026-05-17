@@ -55,7 +55,7 @@ body {
   text-transform: uppercase;
   margin-bottom: 60px;
 }
-.game-grid {
+.-grid {
   display: flex;
   justify-content: center;
   gap: 28px;
@@ -63,7 +63,7 @@ body {
   max-width: 720px;
   margin: 0 auto;
 }
-.game-card {
+.-card {
   width: 280px;
   border: 1px solid rgba(212,175,55,0.25);
   border-radius: 12px;
@@ -75,24 +75,24 @@ body {
   position: relative;
   overflow: hidden;
 }
-.game-card::before {
+.-card::before {
   content: '';
   position: absolute;
   inset: 0;
   background: radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.06) 0%, transparent 70%);
   pointer-events: none;
 }
-.game-card:hover {
+.-card:hover {
   transform: translateY(-6px);
   border-color: rgba(212,175,55,0.6);
   box-shadow: 0 12px 40px rgba(0,0,0,0.4);
 }
-.game-icon {
+.-icon {
   font-size: 52px;
   margin-bottom: 16px;
   display: block;
 }
-.game-name {
+.-name {
   font-family: 'Playfair Display', serif;
   font-size: 22px;
   color: #d4af37;
@@ -100,7 +100,7 @@ body {
   text-transform: uppercase;
   margin-bottom: 10px;
 }
-.game-desc {
+.-desc {
   font-size: 11px;
   color: rgba(240,230,200,0.45);
   line-height: 1.7;
@@ -119,7 +119,7 @@ body {
   text-transform: uppercase;
   transition: background 0.15s;
 }
-.game-card:hover .play-btn { background: rgba(212,175,55,0.15); }
+.-card:hover .play-btn { background: rgba(212,175,55,0.15); }
 
 /* ── BACK BUTTON ── */
 .back-btn {
@@ -139,7 +139,7 @@ body {
 }
 .back-btn:hover { color: rgba(240,230,200,0.8); }
 
-/* ── SHARED GAME STYLES ── */
+/* ── SHARED  STYLES ── */
 h1 {
   font-family: 'Playfair Display', serif;
   text-align: center;
@@ -454,7 +454,7 @@ hr.divider { border: none; border-top: 1px solid rgba(212,175,55,0.12); margin: 
 <div id="screen-bj" class="screen">
   <div class="felt">
     <div class="table-area">
-      <button class="back-btn" onclick="showScreen('screen-home')">&#8592; Back to Games</button>
+      <button class="back-btn" onclick="showScreen('screen-home')">&#8592; Back to fun</button>
       <h1>&#9824; Black Jack &#9829;</h1>
       <div class="subtitle">Vegas rules &middot; Dealer stands on soft 17</div>
       <div class="stats-bar">
@@ -503,7 +503,7 @@ hr.divider { border: none; border-top: 1px solid rgba(212,175,55,0.12); margin: 
 <div id="screen-gr" class="screen">
   <div class="felt">
     <div class="table-area">
-      <button class="back-btn" onclick="showScreen('screen-home')">&#8592; Back to Games</button>
+      <button class="back-btn" onclick="showScreen('screen-home')">&#8592; Back to fun</button>
       <h1>&#9827; Gin Rummy &#9830;</h1>
       <div class="subtitle">2 players &middot; 10 cards each &middot; Knock or Gin</div>
       <div class="stats-bar">
@@ -629,7 +629,7 @@ hr.divider { border: none; border-top: 1px solid rgba(212,175,55,0.12); margin: 
         <tr><td>Undercut</td><td>If the AI's deadwood is equal or lower after your knock, they score 25 pts instead.</td></tr>
       </table>
     </div>
-    <div class="rule-section"><h3>Winning</h3><p>First player to reach <strong>100 points</strong> wins the game.</p></div>
+    <div class="rule-section"><h3>Winning</h3><p>First player to reach <strong>100 points</strong> wins.</p></div>
   </div>
 </div>
 
@@ -645,8 +645,8 @@ hr.divider { border: none; border-top: 1px solid rgba(212,175,55,0.12); margin: 
         <div class="update-tags"><span class="update-tag tag-new">New</span></div>
       </div>
       <ul class="update-items">
-        <li>Added Gin Rummy &mdash; full single-player game vs AI</li>
-        <li>New home screen to choose between games</li>
+        <li>Added Gin Rummy &mdash; full single-player g@me vs AI</li>
+        <li>New home screen to choose between g@mes</li>
         <li>Meld detection, deadwood scoring, Knock and Gin actions</li>
       </ul>
     </div>
