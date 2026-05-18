@@ -672,7 +672,10 @@ let bjPhase='bet';
 function bjVal(c){if(['J','Q','K'].includes(c.rank))return 10;if(c.rank==='A')return 11;return parseInt(c.rank);}
 function bjTotal(hand){let t=0,a=0;for(const c of hand){if(c.hidden)continue;t+=bjVal(c);if(c.rank==='A')a++;}while(t>21&&a-->0)t-=10;return t;}
 function bjIsSoft17(hand){let t=0,a=0;for(const c of hand){t+=bjVal(c);if(c.rank==='A')a++;}let adj=t;while(adj>21&&a-->0)adj-=10;return adj===17&&t!==adj;}
-function bjDraw(){if(bjDeck.length<20)bjDeck=buildDeck();return bjDeck.pop();}
+if (localStorage.getItem('lastSeenVersion') === '2.0') {
+  const b = document.getElementById('new-badge');
+  if (b) b.style.display = 'none';
+  function bjDraw(){if(bjDeck.length<20)bjDeck=buildDeck();return bjDeck.pop();}
 function bjRender(){
   ['bj-player-hand','bj-dealer-hand'].forEach((id,i)=>{
     const el=document.getElementById(id),hand=i===0?bjPlayer:bjDealer;
