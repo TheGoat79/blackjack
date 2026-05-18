@@ -675,6 +675,7 @@ function bjIsSoft17(hand){let t=0,a=0;for(const c of hand){t+=bjVal(c);if(c.rank
 if (localStorage.getItem('lastSeenVersion') === '2.0') {
   const b = document.getElementById('new-badge');
   if (b) b.style.display = 'none';
+}
   function bjDraw(){if(bjDeck.length<20)bjDeck=buildDeck();return bjDeck.pop();}
 function bjRender(){
   ['bj-player-hand','bj-dealer-hand'].forEach((id,i)=>{
