@@ -526,9 +526,10 @@ function showScreen(id){
 }
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
-function openUpdates(){
-  const b=document.getElementById('new-badge');
-  if(b) b.style.display='none';
+function openUpdates() {
+  const b = document.getElementById('new-badge');
+  if (b) b.style.display = 'none';
+  localStorage.setItem('lastSeenVersion', '2.0');
   openModal('updates');
 }
 
