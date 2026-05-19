@@ -151,13 +151,44 @@ hr.divider{border:none;border-top:1px solid rgba(212,175,55,0.12);margin:18px 0;
 .idt-card.not-my-turn{cursor:default;opacity:0.7;}
 .idt-rank{font-size:16px;line-height:1;}
 .idt-suit{font-size:12px;line-height:1;text-align:right;}
-.idt-card-mid{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:22px;line-height:1;}
 .idt-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;}
 .idt-log{margin-top:14px;max-height:140px;overflow-y:auto;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:10px;}
 .idt-log-line{font-size:10px;color:rgba(240,230,200,0.4);padding:3px 0;line-height:1.6;border-bottom:1px solid rgba(255,255,255,0.03);}
 .idt-log-line.you{color:rgba(125,255,179,0.75);}
 .idt-log-line.caught{color:rgba(255,128,128,0.75);}
 .idt-log-line.safe{color:rgba(212,175,55,0.75);}
+
+
+/* POKER */
+.pk-table-wrap{background:radial-gradient(ellipse at center,#1a5c3a 0%,#0d4a2a 100%);border:3px solid #5a3a1a;border-radius:20px;padding:18px;margin-bottom:16px;position:relative;}
+.pk-community{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;min-height:100px;align-items:center;}
+.pk-pot{text-align:center;font-size:11px;color:rgba(240,230,200,0.5);letter-spacing:2px;margin-bottom:6px;}
+.pk-pot span{color:#d4af37;font-family:'Playfair Display',serif;font-size:18px;}
+.pk-players-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;}
+.pk-player-box{flex:1;min-width:130px;max-width:180px;border:1px solid rgba(212,175,55,0.2);border-radius:8px;padding:10px;background:rgba(0,0,0,0.25);text-align:center;transition:border-color 0.2s;}
+.pk-player-box.active{border-color:#7dffb3;background:rgba(125,255,179,0.05);}
+.pk-player-box.folded{opacity:0.35;}
+.pk-player-box.dealer-mark{border-color:rgba(212,175,55,0.5);}
+.pk-player-name{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(240,230,200,0.4);margin-bottom:3px;}
+.pk-player-chips{font-family:'Playfair Display',serif;font-size:16px;color:#7dffb3;margin-bottom:4px;}
+.pk-player-bet{font-size:9px;color:rgba(212,175,55,0.6);letter-spacing:1px;min-height:14px;}
+.pk-player-cards{display:flex;gap:4px;justify-content:center;margin-top:6px;min-height:50px;align-items:center;}
+.pk-card{width:36px;height:52px;border-radius:4px;display:flex;flex-direction:column;justify-content:space-between;padding:3px 3px;font-family:'Playfair Display',serif;font-weight:700;flex-shrink:0;box-shadow:1px 2px 5px rgba(0,0,0,0.5);animation:dealCard 0.25s ease-out;}
+.pk-card.red{background:#fff;color:#c41e1e;border:1px solid #ccc;}
+.pk-card.black{background:#fff;color:#1a1a1a;border:1px solid #ccc;}
+.pk-card.hidden{background:repeating-linear-gradient(135deg,#1a3a5c 0px,#1a3a5c 4px,#0d2640 4px,#0d2640 8px);border:1px solid #2a4a7c;}
+.pk-card-r{font-size:10px;line-height:1;}
+.pk-card-s{font-size:9px;line-height:1;text-align:right;}
+.pk-card-lg{width:62px;height:90px;border-radius:7px;padding:5px 6px;}
+.pk-card-lg .pk-card-r{font-size:15px;}
+.pk-card-lg .pk-card-s{font-size:13px;}
+.pk-hand-label{font-size:9px;color:rgba(240,230,200,0.3);letter-spacing:1px;margin-bottom:6px;}
+.pk-hand-strength{font-size:11px;color:#d4af37;letter-spacing:1px;margin-top:4px;min-height:16px;text-align:center;}
+.pk-your-cards{display:flex;gap:8px;justify-content:center;margin:10px 0 6px;}
+.pk-bet-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+.pk-raise-input{background:rgba(0,0,0,0.3);border:1px solid rgba(212,175,55,0.3);border-radius:4px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:12px;color:#f0e6c8;width:100px;outline:none;}
+.pk-raise-input:focus{border-color:rgba(212,175,55,0.6);}
+.pk-phase-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:rgba(240,230,200,0.35);text-align:center;margin-bottom:8px;}
 
 /* MODALS */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;align-items:center;justify-content:center;padding:20px;}
@@ -253,6 +284,12 @@ hr.divider{border:none;border-top:1px solid rgba(212,175,55,0.12);margin:18px 0;
         <span class="game-icon">&#127183;</span>
         <div class="game-name">I Doubt It</div>
         <div class="game-desc">Bluff the rank, catch liars. Play cards face-down and challenge anyone who's cheating!</div>
+        <div class="play-btn">Play Now</div>
+      </div>
+      <div class="game-card" onclick="showScreen('screen-poker');pkInit()">
+        <span class="game-icon">&#9829;</span>
+        <div class="game-name">Texas Hold'em</div>
+        <div class="game-desc">2 AI opponents, blinds-based betting. Flop, Turn, River. Best 5-card hand wins the pot.</div>
         <div class="play-btn">Play Now</div>
       </div>
     </div>
@@ -409,6 +446,54 @@ hr.divider{border:none;border-top:1px solid rgba(212,175,55,0.12);margin:18px 0;
   </div>
 </div>
 
+
+<!-- ══ POKER ══ -->
+<div id="screen-poker" class="screen">
+  <div class="felt">
+    <div class="table-area">
+      <button class="back-btn" onclick="showScreen('screen-home')">&#8592; Back to Games</button>
+      <h1>&#9829; Texas Hold'em &#9824;</h1>
+      <div class="subtitle">2 AI opponents &middot; Blinds &middot; Best hand wins the pot</div>
+      <div class="stats-bar">
+        <div class="stat"><div class="stat-label">Your Chips</div><div class="stat-val chips" id="pk-chips">1,000</div></div>
+        <div class="stat"><div class="stat-label">Wins</div><div class="stat-val" id="pk-wins">0</div></div>
+        <div class="stat"><div class="stat-label">Losses</div><div class="stat-val" id="pk-losses">0</div></div>
+        <div class="stat"><div class="stat-label">Hand</div><div class="stat-val" id="pk-hand-num">1</div></div>
+      </div>
+
+      <div class="pk-table-wrap">
+        <div class="pk-phase-label" id="pk-phase-label">Pre-Flop</div>
+        <div class="pk-pot">Pot: <span id="pk-pot">0</span></div>
+        <div class="pk-community" id="pk-community"></div>
+        <div class="pk-players-row" id="pk-players-row"></div>
+      </div>
+
+      <div class="zone-label">Your Hand <span class="pk-hand-strength" id="pk-hand-strength"></span></div>
+      <div class="pk-your-cards" id="pk-your-cards"></div>
+
+      <div class="message-box" id="pk-message-box"></div>
+
+      <div class="pk-bet-controls" id="pk-bet-controls">
+        <button class="btn btn-stand" id="pk-fold-btn" onclick="pkFold()" disabled>Fold</button>
+        <button class="btn btn-action" id="pk-check-btn" onclick="pkCheck()" disabled>Check</button>
+        <button class="btn btn-deal" id="pk-call-btn" onclick="pkCall()" disabled>Call</button>
+        <button class="btn btn-double" id="pk-raise-btn" onclick="pkRaise()" disabled>Raise</button>
+        <input class="pk-raise-input" type="number" id="pk-raise-amt" value="20" min="1"/>
+      </div>
+
+      <div class="hint" id="pk-hint">Press Deal to start</div>
+      <div class="action-row" style="margin-top:10px;">
+        <button class="btn btn-deal" id="pk-deal-btn" onclick="pkDeal()">Deal Hand</button>
+      </div>
+
+      <div class="bottom-links">
+        <button class="how-to-btn" onclick="openModal('pk-howto')">? How to Play</button>
+        <button class="updates-btn" onclick="openUpdates()">&#9733; What's New</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ MODALS ══ -->
 <div class="modal-overlay" id="leaderboard-modal" onclick="if(event.target===this)closeModal('leaderboard-modal')">
   <div class="modal">
@@ -488,20 +573,37 @@ hr.divider{border:none;border-top:1px solid rgba(212,175,55,0.12);margin:18px 0;
   </div>
 </div>
 
+<div class="modal-overlay" id="pk-howto" onclick="if(event.target===this)closeModal('pk-howto')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('pk-howto')">&#10005;</button>
+    <h2>How to Play Texas Hold'em</h2>
+    <div class="rule-section"><h3>The Goal</h3><p>Make the best 5-card hand using any combination of your 2 hole cards and the 5 community cards.</p></div>
+    <div class="rule-section"><h3>Betting Rounds</h3>
+      <table class="action-table">
+        <tr><td>Pre-Flop</td><td>Hole cards dealt. Small &amp; big blind posted.</td></tr>
+        <tr><td>Flop</td><td>3 community cards revealed.</td></tr>
+        <tr><td>Turn</td><td>4th community card revealed.</td></tr>
+        <tr><td>River</td><td>5th community card. Final betting.</td></tr>
+        <tr><td>Showdown</td><td>Best hand wins the pot.</td></tr>
+      </table>
+    </div>
+    <div class="rule-section"><h3>Your Actions</h3>
+      <table class="action-table">
+        <tr><td>Fold</td><td>Give up your hand and forfeit bets.</td></tr>
+        <tr><td>Check</td><td>Pass (only when no bet to call).</td></tr>
+        <tr><td>Call</td><td>Match the current bet.</td></tr>
+        <tr><td>Raise</td><td>Increase the bet by your raise amount.</td></tr>
+      </table>
+    </div>
+    <div class="rule-section"><h3>Hand Rankings (best to worst)</h3><p>Royal Flush &gt; Straight Flush &gt; Four of a Kind &gt; Full House &gt; Flush &gt; Straight &gt; Three of a Kind &gt; Two Pair &gt; One Pair &gt; High Card</p></div>
+    <div class="rule-section"><h3>Blinds</h3><p>Small blind = 10 chips, Big blind = 20 chips. Dealer position rotates each hand.</p></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="updates" onclick="if(event.target===this)closeModal('updates')">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('updates')">&#10005;</button>
     <h2>What's New</h2>
-    <div class="update-entry">
-      <div class="update-header">
-    <span class="update-version">v2.1.2</span>
-        <span class="update-date">May 2026</span>
-        <div class="update-tags"><span class="update-tag tag-fix">Fix</span></div>
-      </div>
-      <ul class="update-items">
-        <li>Fixed card symbols not showing in I Doubt It/BS</li>
-      </ul>
-    </div>
     <div class="update-entry">
       <div class="update-header">
         <span class="update-version">v2.1</span>
@@ -510,6 +612,7 @@ hr.divider{border:none;border-top:1px solid rgba(212,175,55,0.12);margin:18px 0;
       </div>
       <ul class="update-items">
         <li>Added I Doubt It &mdash; 3 AI opponents, bluffing, pile-based chip wagering</li>
+        <li>Fixed card symbols not showing in I Doubt It</li>
         <li>Fixed card selection &mdash; Play Selected now always works on your turn</li>
         <li>Clearer UI &mdash; current rank, last claim, and turn indicator always visible</li>
       </ul>
@@ -889,9 +992,10 @@ function idtInit(){
 function idtMakeCard(c,selected){
   const d=document.createElement('div');
   d.className='idt-card '+(RED.has(c.suit)?'red':'black')+(selected?' sel':'');
-  d.innerHTML='<div style="font-size:15px;font-weight:700;line-height:1;">'+c.rank+'</div>'
-    +'<div style="font-size:26px;line-height:1;text-align:center;">'+c.suit+'</div>'
-    +'<div style="font-size:15px;font-weight:700;line-height:1;text-align:right;">'+c.rank+'</div>';
+  const top=document.createElement('div'); top.className='idt-rank'; top.textContent=c.rank;
+  const mid=document.createElement('div'); mid.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:22px;line-height:1;'; mid.textContent=c.suit;
+  const bot=document.createElement('div'); bot.className='idt-suit'; bot.textContent=c.rank;
+  d.appendChild(top);d.appendChild(mid);d.appendChild(bot);
   return d;
 }
 
@@ -1107,6 +1211,377 @@ function idtLog(text,cls){
 function idtMsg(t,cls){const b=document.getElementById('idt-message-box');b.textContent=t;b.className='message-box msg-'+cls;b.style.display='block';}
 function idtHideMsg(){document.getElementById('idt-message-box').style.display='none';}
 function idtHint(t){document.getElementById('idt-hint').textContent=t;}
+
+// ══════════════════ TEXAS HOLD'EM ══════════════════
+const PK_NAMES = ['You', 'Alex', 'Jordan'];
+const PK_SB = 10, PK_BB = 20;
+const PK_PHASES = ['Pre-Flop','Flop','Turn','River','Showdown'];
+const PK_HAND_RANKS = ['High Card','One Pair','Two Pair','Three of a Kind','Straight','Flush','Full House','Four of a Kind','Straight Flush','Royal Flush'];
+
+let pkStacks=[], pkHoles=[], pkCommunity=[], pkPot=0;
+let pkPhase=0, pkDealer=0, pkCurrent=0, pkBets=[], pkFolded=[];
+let pkCurrentBet=0, pkLastRaiser=-1, pkActed=[];
+let pkWins=0, pkLosses=0, pkHandNum=1, pkRunning=false;
+
+function pkInit(){
+  if(currentUser) pkStacks[0]=currentUser.chips;
+  else pkStacks[0]=pkStacks[0]||1000;
+  pkStacks[1]=pkStacks[1]||1000;
+  pkStacks[2]=pkStacks[2]||1000;
+  pkRender();
+  pkHideMsg();
+  pkHint('Press Deal Hand to start');
+  pkSetBtns(false);
+  document.getElementById('pk-chips').textContent=(pkStacks[0]||1000).toLocaleString();
+}
+
+function pkMakeCard(c, large, hidden){
+  const d=document.createElement('div');
+  if(hidden){ d.className='pk-card hidden'+(large?' pk-card-lg':''); return d; }
+  d.className='pk-card '+(RED.has(c.suit)?'red':'black')+(large?' pk-card-lg':'');
+  const r=document.createElement('div'); r.className='pk-card-r'; r.textContent=c.rank;
+  const s=document.createElement('div'); s.className='pk-card-s'; s.textContent=c.suit;
+  d.appendChild(r); d.appendChild(s);
+  return d;
+}
+
+function pkRender(){
+  // Community cards
+  const commEl=document.getElementById('pk-community');
+  commEl.innerHTML='';
+  const shown = pkPhase===0?0:pkPhase===1?3:pkPhase===2?4:5;
+  for(let i=0;i<5;i++){
+    if(i<shown && pkCommunity[i]) commEl.appendChild(pkMakeCard(pkCommunity[i],true,false));
+    else if(i<5){ const blank=document.createElement('div'); blank.className='pk-card pk-card-lg hidden'; commEl.appendChild(blank); }
+  }
+  document.getElementById('pk-phase-label').textContent=PK_PHASES[Math.min(pkPhase,4)];
+  document.getElementById('pk-pot').textContent=pkPot.toLocaleString();
+
+  // Players row (AIs)
+  const pRow=document.getElementById('pk-players-row');
+  pRow.innerHTML='';
+  for(let i=1;i<3;i++){
+    const box=document.createElement('div');
+    const isActive=pkCurrent===i&&pkRunning, isFolded=pkFolded[i];
+    const isDealer=pkDealer===i;
+    box.className='pk-player-box'+(isActive?' active':'')+(isFolded?' folded':'')+(isDealer?' dealer-mark':'');
+    const nm=document.createElement('div'); nm.className='pk-player-name';
+    nm.textContent=(isDealer?'[D] ':'')+(isActive?'▶ ':'')+PK_NAMES[i]+(isFolded?' (folded)':'');
+    const ch=document.createElement('div'); ch.className='pk-player-chips';
+    ch.textContent=pkStacks[i].toLocaleString()+' chips';
+    const bt=document.createElement('div'); bt.className='pk-player-bet';
+    bt.textContent=pkBets[i]>0?'Bet: '+pkBets[i]:'';
+    const cards=document.createElement('div'); cards.className='pk-player-cards';
+    if(pkRunning && !isFolded){
+      if(pkPhase>=4 && pkHoles[i]){ // showdown — reveal
+        pkHoles[i].forEach(c=>cards.appendChild(pkMakeCard(c,false,false)));
+      } else {
+        cards.appendChild(pkMakeCard(null,false,true));
+        cards.appendChild(pkMakeCard(null,false,true));
+      }
+    }
+    box.appendChild(nm);box.appendChild(ch);box.appendChild(bt);box.appendChild(cards);
+    pRow.appendChild(box);
+  }
+
+  // Your cards
+  const ycEl=document.getElementById('pk-your-cards');
+  ycEl.innerHTML='';
+  if(pkHoles[0] && pkRunning){
+    pkHoles[0].forEach(c=>ycEl.appendChild(pkMakeCard(c,true,false)));
+  }
+
+  // Hand strength
+  const shown2=pkPhase>=1?pkCommunity.slice(0,pkPhase===1?3:pkPhase===2?4:5):[];
+  if(pkHoles[0] && pkRunning && shown2.length>0){
+    const best=pkBestHand([...pkHoles[0],...shown2]);
+    document.getElementById('pk-hand-strength').textContent=PK_HAND_RANKS[best.rank];
+  } else {
+    document.getElementById('pk-hand-strength').textContent='';
+  }
+
+  // Chips display
+  document.getElementById('pk-chips').textContent=pkStacks[0].toLocaleString();
+
+  // Your bet label
+  const yourBet=pkBets[0]>0?'Your bet: '+pkBets[0]+' chips':'';
+  pkHint(pkRunning?(pkCurrent===0?yourBet||'Your turn':PK_NAMES[pkCurrent]+' is thinking...'):document.getElementById('pk-hint').textContent);
+}
+
+function pkSetBtns(myTurn){
+  document.getElementById('pk-fold-btn').disabled=!myTurn;
+  document.getElementById('pk-check-btn').disabled=!myTurn;
+  document.getElementById('pk-call-btn').disabled=!myTurn;
+  document.getElementById('pk-raise-btn').disabled=!myTurn;
+  document.getElementById('pk-deal-btn').disabled=pkRunning;
+}
+
+function pkDeal(){
+  if(pkRunning) return;
+  // Bust check
+  for(let i=0;i<3;i++) if(pkStacks[i]<=0) pkStacks[i]=500;
+  pkRunning=true; pkPhase=0;
+  pkPot=0; pkBets=[0,0,0]; pkFolded=[false,false,false];
+  pkCurrentBet=0; pkLastRaiser=-1; pkActed=[false,false,false];
+  pkHoles=[[],[],[]]; pkCommunity=[];
+  const deck=buildDeck();
+  for(let i=0;i<2;i++) for(let p=0;p<3;p++) pkHoles[p].push(deck.pop());
+  for(let i=0;i<5;i++) pkCommunity.push(deck.pop());
+  pkHandNum++;
+  document.getElementById('pk-hand-num').textContent=pkHandNum;
+
+  // Post blinds — positions relative to dealer
+  const sbPos=(pkDealer+1)%3, bbPos=(pkDealer+2)%3;
+  pkPostBlind(sbPos,PK_SB);
+  pkPostBlind(bbPos,PK_BB);
+  pkCurrentBet=PK_BB;
+  // First to act pre-flop is left of BB
+  pkCurrent=(pkDealer+3)%3;
+  pkActed=[false,false,false];
+
+  pkRender();
+  pkHideMsg();
+  pkHint('Pre-Flop — blinds posted. Your turn!');
+  document.getElementById('pk-deal-btn').disabled=true;
+
+  if(pkCurrent!==0) setTimeout(pkAIMove,900);
+  else pkSetBtns(true);
+}
+
+function pkPostBlind(pos,amount){
+  const actual=Math.min(amount,pkStacks[pos]);
+  pkStacks[pos]-=actual; pkBets[pos]+=actual; pkPot+=actual;
+}
+
+// ── Player actions ──
+function pkFold(){
+  if(pkCurrent!==0||!pkRunning)return;
+  pkFolded[0]=true;
+  pkLosses++;
+  pkRunning=false;
+  pkRender();
+  pkSetBtns(false);
+  pkMsg('You folded. AI wins the pot of '+pkPot+' chips.','lose');
+  pkHint('Press Deal Hand to continue');
+  document.getElementById('pk-deal-btn').disabled=false;
+  if(currentUser){currentUser.chips=pkStacks[0];saveChips('poker','fold',-pkBets[0]);}
+}
+
+function pkCheck(){
+  if(pkCurrent!==0||!pkRunning)return;
+  const toCall=pkCurrentBet-pkBets[0];
+  if(toCall>0){pkHint('Cannot check — must call '+toCall+' or fold');return;}
+  pkActed[0]=true;
+  pkAdvance();
+}
+
+function pkCall(){
+  if(pkCurrent!==0||!pkRunning)return;
+  const toCall=Math.min(pkCurrentBet-pkBets[0],pkStacks[0]);
+  pkStacks[0]-=toCall; pkBets[0]+=toCall; pkPot+=toCall;
+  pkActed[0]=true;
+  pkRender();
+  pkAdvance();
+}
+
+function pkRaise(){
+  if(pkCurrent!==0||!pkRunning)return;
+  const raiseAmt=parseInt(document.getElementById('pk-raise-amt').value)||20;
+  const toCall=pkCurrentBet-pkBets[0];
+  const total=toCall+raiseAmt;
+  const actual=Math.min(total,pkStacks[0]);
+  pkStacks[0]-=actual; pkBets[0]+=actual; pkPot+=actual;
+  pkCurrentBet=pkBets[0];
+  pkLastRaiser=0;
+  pkActed=[false,false,false]; pkActed[0]=true;
+  pkRender();
+  pkAdvance();
+}
+
+function pkAdvance(){
+  pkSetBtns(false);
+  // Find next active player
+  let next=(pkCurrent+1)%3;
+  let laps=0;
+  while((pkFolded[next]||pkStacks[next]===0)&&laps<3){next=(next+1)%3;laps++;}
+
+  // Check if betting round is over
+  const active=pkFolded.map((f,i)=>!f);
+  const activePlayers=active.filter(Boolean).length;
+  if(activePlayers<=1){ pkShowdown(); return; }
+
+  const allActed=pkActed.every((a,i)=>a||pkFolded[i]||pkStacks[i]===0);
+  const allCalled=[0,1,2].filter(i=>!pkFolded[i]&&pkStacks[i]>0).every(i=>pkBets[i]===pkCurrentBet);
+
+  if(allActed&&allCalled){
+    pkNextPhase();
+    return;
+  }
+
+  pkCurrent=next;
+  pkRender();
+  if(pkCurrent!==0) setTimeout(pkAIMove,900);
+  else pkSetBtns(true);
+}
+
+function pkNextPhase(){
+  pkPhase++;
+  pkBets=[0,0,0]; pkCurrentBet=0; pkLastRaiser=-1;
+  pkActed=[false,false,false];
+  // First to act post-flop is left of dealer
+  pkCurrent=(pkDealer+1)%3;
+  while(pkFolded[pkCurrent]||pkStacks[pkCurrent]===0) pkCurrent=(pkCurrent+1)%3;
+  if(pkPhase>=4){ pkShowdown(); return; }
+  pkRender();
+  if(pkCurrent!==0) setTimeout(pkAIMove,900);
+  else pkSetBtns(true);
+}
+
+function pkAIMove(){
+  if(!pkRunning||pkCurrent===0)return;
+  const ai=pkCurrent;
+  const toCall=pkCurrentBet-pkBets[ai];
+  const hand=pkHoles[ai];
+  const comm=pkCommunity.slice(0,pkPhase===0?0:pkPhase===1?3:pkPhase===2?4:5);
+  const score=pkPhase>0?pkBestHand([...hand,...comm]).rank:pkPreFlopScore(hand);
+
+  // Simple AI strategy based on hand strength
+  let action;
+  if(score>=6||(pkPhase===0&&score>=7)){
+    // Strong hand — raise
+    const raiseAmt=Math.min(PK_BB*2,pkStacks[ai]);
+    const total=Math.min(toCall+raiseAmt,pkStacks[ai]);
+    pkStacks[ai]-=total; pkBets[ai]+=total; pkPot+=total;
+    pkCurrentBet=Math.max(pkCurrentBet,pkBets[ai]);
+    pkLastRaiser=ai; pkActed=[false,false,false]; pkActed[ai]=true;
+    action='raises';
+  } else if(score>=3||(pkPhase===0&&score>=5)){
+    // Medium — call or check
+    if(toCall===0){ pkActed[ai]=true; action='checks'; }
+    else if(toCall<=pkStacks[ai]){
+      const actual=Math.min(toCall,pkStacks[ai]);
+      pkStacks[ai]-=actual; pkBets[ai]+=actual; pkPot+=actual;
+      pkActed[ai]=true; action='calls';
+    } else { pkFolded[ai]=true; action='folds'; }
+  } else {
+    // Weak — fold if there's a bet, else check
+    if(toCall>0&&Math.random()>0.3){ pkFolded[ai]=true; action='folds'; }
+    else { pkActed[ai]=true; action='checks'; }
+  }
+
+  pkRender();
+  pkHint(PK_NAMES[ai]+' '+action+'.');
+  setTimeout(()=>{
+    const activePlayers=[0,1,2].filter(i=>!pkFolded[i]).length;
+    if(activePlayers<=1){ pkShowdown(); return; }
+    pkAdvance();
+  },600);
+}
+
+function pkPreFlopScore(hole){
+  const r0=RANKS.indexOf(hole[0].rank), r1=RANKS.indexOf(hole[1].rank);
+  const paired=hole[0].rank===hole[1].rank;
+  const suited=hole[0].suit===hole[1].suit;
+  const high=Math.max(r0,r1);
+  if(paired&&high>=10)return 8;
+  if(paired)return 6;
+  if(high>=12&&suited)return 7;
+  if(high>=10)return 5;
+  if(suited)return 4;
+  return Math.floor(high/3);
+}
+
+function pkShowdown(){
+  pkPhase=4; pkRunning=false;
+  pkRender();
+  const alive=[0,1,2].filter(i=>!pkFolded[i]);
+  if(alive.length===1){
+    const w=alive[0];
+    pkStacks[w]+=pkPot;
+    if(w===0){pkWins++;if(currentUser){currentUser.chips=pkStacks[0];saveChips('poker','win',pkPot-pkBets[0]);}}
+    else pkLosses++;
+    pkMsg(PK_NAMES[w]+' wins the pot of '+pkPot+' chips!'+(w===0?' +'+pkPot+' chips!':''),'win');
+  } else {
+    // Evaluate hands
+    let bestScore=-1, winners=[];
+    alive.forEach(i=>{
+      const all=[...pkHoles[i],...pkCommunity];
+      const {rank,tiebreak}=pkBestHand(all);
+      if(rank>bestScore){ bestScore=rank; winners=[i]; }
+      else if(rank===bestScore) winners.push(i);
+    });
+    const share=Math.floor(pkPot/winners.length);
+    winners.forEach(w=>{pkStacks[w]+=share;});
+    const winNames=winners.map(w=>PK_NAMES[w]).join(' & ');
+    const handName=PK_HAND_RANKS[bestScore];
+    if(winners.includes(0)){
+      pkWins++;
+      if(currentUser){currentUser.chips=pkStacks[0];saveChips('poker','win',share-pkBets[0]);}
+      pkMsg('You win with '+handName+'! +'+share+' chips!','win');
+    } else {
+      pkLosses++;
+      if(currentUser){currentUser.chips=pkStacks[0];saveChips('poker','lose',-pkBets[0]);}
+      pkMsg(winNames+' wins with '+handName+'!','lose');
+    }
+  }
+  document.getElementById('pk-wins').textContent=pkWins;
+  document.getElementById('pk-losses').textContent=pkLosses;
+  document.getElementById('pk-chips').textContent=pkStacks[0].toLocaleString();
+  if(currentUser) currentUser.chips=pkStacks[0];
+  pkDealer=(pkDealer+1)%3;
+  pkSetBtns(false);
+  document.getElementById('pk-deal-btn').disabled=false;
+  pkHint('Press Deal Hand to continue');
+}
+
+// ── Hand evaluator (7 cards, pick best 5) ──
+function pkBestHand(cards){
+  // Generate all C(7,5) = 21 combos
+  let best={rank:-1,tiebreak:[]};
+  for(let i=0;i<cards.length-1;i++){
+    for(let j=i+1;j<cards.length;j++){
+      const five=cards.filter((_,k)=>k!==i&&k!==j);
+      const ev=pkEval5(five);
+      if(ev.rank>best.rank||(ev.rank===best.rank&&pkCmpArr(ev.tiebreak,best.tiebreak)>0)) best=ev;
+    }
+  }
+  return best;
+}
+function pkCmpArr(a,b){for(let i=0;i<a.length;i++){if(a[i]>b[i])return 1;if(a[i]<b[i])return -1;}return 0;}
+function pkRV(c){const i=RANKS.indexOf(c.rank);return i===0?14:i+1;} // Ace high
+function pkEval5(cards){
+  const vals=cards.map(pkRV).sort((a,b)=>b-a);
+  const suits=cards.map(c=>c.suit);
+  const flush=suits.every(s=>s===suits[0]);
+  const uv=[...new Set(vals)];
+  const counts=uv.map(v=>({v,n:vals.filter(x=>x===v).length})).sort((a,b)=>b.n-a.n||b.v-a.v);
+
+  // Straight check (handle A-2-3-4-5)
+  let straight=false, straightHigh=0;
+  const sv=[...vals];
+  if(sv[0]===14) sv.push(1); // ace low
+  for(let i=0;i<=sv.length-5;i++){
+    const slice=sv.slice(i,i+5);
+    if(slice[0]-slice[4]===4&&new Set(slice).size===5){straight=true;straightHigh=slice[0];break;}
+  }
+
+  let rank,tb;
+  if(straight&&flush){rank=vals[0]===14&&vals[1]===13?9:8;tb=[straightHigh];}
+  else if(counts[0].n===4){rank=7;tb=[counts[0].v,counts[1].v];}
+  else if(counts[0].n===3&&counts[1].n===2){rank=6;tb=[counts[0].v,counts[1].v];}
+  else if(flush){rank=5;tb=vals;}
+  else if(straight){rank=4;tb=[straightHigh];}
+  else if(counts[0].n===3){rank=3;tb=[counts[0].v,...counts.slice(1).map(c=>c.v)];}
+  else if(counts[0].n===2&&counts[1].n===2){rank=2;tb=[counts[0].v,counts[1].v,counts[2].v];}
+  else if(counts[0].n===2){rank=1;tb=[counts[0].v,...counts.slice(1).map(c=>c.v)];}
+  else{rank=0;tb=vals;}
+  return{rank,tiebreak:tb};
+}
+
+function pkMsg(t,cls){const b=document.getElementById('pk-message-box');b.textContent=t;b.className='message-box msg-'+cls;b.style.display='block';}
+function pkHideMsg(){document.getElementById('pk-message-box').style.display='none';}
+function pkHint(t){const el=document.getElementById('pk-hint');if(el)el.textContent=t;}
+
 </script>
 </body>
 </html>
