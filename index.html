@@ -889,10 +889,9 @@ function idtInit(){
 function idtMakeCard(c,selected){
   const d=document.createElement('div');
   d.className='idt-card '+(RED.has(c.suit)?'red':'black')+(selected?' sel':'');
-  const top=document.createElement('div'); top.className='idt-rank'; top.textContent=c.rank;
-  const mid=document.createElement('div'); mid.className='idt-card-mid'; mid.textContent=c.suit;
-  const bot=document.createElement('div'); bot.className='idt-suit'; bot.textContent=c.rank;
-  d.appendChild(top);d.appendChild(mid);d.appendChild(bot);
+  d.innerHTML='<div style="font-size:15px;font-weight:700;line-height:1;">'+c.rank+'</div>'
+    +'<div style="font-size:26px;line-height:1;text-align:center;">'+c.suit+'</div>'
+    +'<div style="font-size:15px;font-weight:700;line-height:1;text-align:right;">'+c.rank+'</div>';
   return d;
 }
 
