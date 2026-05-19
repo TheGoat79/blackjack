@@ -151,6 +151,7 @@ hr.divider{border:none;border-top:1px solid rgba(212,175,55,0.12);margin:18px 0;
 .idt-card.not-my-turn{cursor:default;opacity:0.7;}
 .idt-rank{font-size:16px;line-height:1;}
 .idt-suit{font-size:12px;line-height:1;text-align:right;}
+.idt-card-mid{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:22px;line-height:1;}
 .idt-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;}
 .idt-log{margin-top:14px;max-height:140px;overflow-y:auto;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:10px;}
 .idt-log-line{font-size:10px;color:rgba(240,230,200,0.4);padding:3px 0;line-height:1.6;border-bottom:1px solid rgba(255,255,255,0.03);}
@@ -493,13 +494,22 @@ hr.divider{border:none;border-top:1px solid rgba(212,175,55,0.12);margin:18px 0;
     <h2>What's New</h2>
     <div class="update-entry">
       <div class="update-header">
+    <span class="update-version">v2.1.2</span>
+        <span class="update-date">May 2026</span>
+        <div class="update-tags"><span class="update-tag tag-fix">Fix</span></div>
+      </div>
+      <ul class="update-items">
+        <li>Fixed card symbols not showing in I Doubt It/BS</li>
+      </ul>
+    </div>
+    <div class="update-entry">
+      <div class="update-header">
         <span class="update-version">v2.1</span>
         <span class="update-date">May 2026</span>
         <div class="update-tags"><span class="update-tag tag-new">New</span><span class="update-tag tag-fix">Fix</span></div>
       </div>
       <ul class="update-items">
         <li>Added I Doubt It &mdash; 3 AI opponents, bluffing, pile-based chip wagering</li>
-        <li>Fixed card symbols not showing in I Doubt It</li>
         <li>Fixed card selection &mdash; Play Selected now always works on your turn</li>
         <li>Clearer UI &mdash; current rank, last claim, and turn indicator always visible</li>
       </ul>
@@ -880,7 +890,7 @@ function idtMakeCard(c,selected){
   const d=document.createElement('div');
   d.className='idt-card '+(RED.has(c.suit)?'red':'black')+(selected?' sel':'');
   const top=document.createElement('div'); top.className='idt-rank'; top.textContent=c.rank;
-  const mid=document.createElement('div'); mid.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:22px;line-height:1;'; mid.textContent=c.suit;
+  const mid=document.createElement('div'); mid.className='idt-card-mid'; mid.textContent=c.suit;
   const bot=document.createElement('div'); bot.className='idt-suit'; bot.textContent=c.rank;
   d.appendChild(top);d.appendChild(mid);d.appendChild(bot);
   return d;
