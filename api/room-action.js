@@ -16,25 +16,32 @@ export default async function handler(req, res) {
   const { code, user_id, action, payload } = req.body;
   if (!code || !user_id || !action) return res.status(400).json({ error: 'Missing fields' });
 
-  const { data: room, error } = await supabase.from('rooms').select('*').eq('code', code).single();
+  const { data: room, error } = await supabase
+    .from('rooms').select('*').eq('code', code).single();
   if (error || !room) return res.status(404).json({ error: 'Room not found' });
 
-  const state = JSON.parse(room.state || '{}');
-  const players = JSON.parse(room.players || '[]');
+  // Handle chat separately — broadcast directly
+  if (action === 'chat') {
+    await pusher.trigger('room-' + code, 'chat', {
+      username: payload.username,
+      message: payload.message,
+    });
+    return res.status(200).json({ ok: true });
+  }
 
-  // Broadcast the action to all players in the room
+  // Handle game state updates
+  if (payload?.state) {
+    await supabase.from('rooms')
+      .update({ state: JSON.stringify(payload.state) })
+      .eq('code', code);
+  }
+
+  // Broadcast game action to all players
   await pusher.trigger('room-' + code, 'game-action', {
     user_id,
     action,
     payload,
-    state,
-    players,
   });
-
-  // Update state if provided
-  if (payload?.state) {
-    await supabase.from('rooms').update({ state: JSON.stringify(payload.state) }).eq('code', code);
-  }
 
   return res.status(200).json({ ok: true });
 }
