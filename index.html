@@ -6,6 +6,7 @@
 <title>Card Room</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://js.pusher.com/8.3.0/pusher.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#0d3d2b;font-family:'DM Mono',monospace;color:#f0e6c8;min-height:100vh;overflow-x:hidden;}
@@ -159,6 +160,56 @@ hr.divider{border:none;border-top:1px solid rgba(212,175,55,0.12);margin:18px 0;
 .idt-log-line.safe{color:rgba(212,175,55,0.75);}
 
 
+
+/* MULTIPLAYER */
+.multiplayer-btn{background:none;border:1px solid rgba(125,255,179,0.4);border-radius:4px;padding:5px 14px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(125,255,179,0.7);cursor:pointer;transition:all 0.15s;}
+.multiplayer-btn:hover{border-color:#7dffb3;color:#7dffb3;}
+.mp-section{max-width:600px;margin:0 auto;}
+.mp-tabs{display:flex;border-bottom:1px solid rgba(212,175,55,0.2);margin-bottom:24px;}
+.mp-tab{flex:1;padding:10px;background:none;border:none;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;color:rgba(240,230,200,0.35);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s;}
+.mp-tab.active{color:#d4af37;border-bottom-color:#d4af37;}
+.mp-panel{display:none;}.mp-panel.active{display:block;}
+.mp-form{display:flex;flex-direction:column;gap:14px;}
+.mp-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(240,230,200,0.4);margin-bottom:4px;}
+.mp-select,.mp-input{background:rgba(0,0,0,0.3);border:1px solid rgba(212,175,55,0.2);border-radius:4px;padding:11px 14px;font-family:'DM Mono',monospace;font-size:13px;color:#f0e6c8;outline:none;transition:border-color 0.15s;width:100%;}
+.mp-select:focus,.mp-input:focus{border-color:rgba(212,175,55,0.6);}
+.mp-select option{background:#0d3d2b;}
+.mp-btn{padding:12px;border-radius:4px;border:1px solid #d4af37;background:rgba(212,175,55,0.1);color:#d4af37;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background 0.15s;}
+.mp-btn:hover{background:rgba(212,175,55,0.2);}
+.mp-btn.green{border-color:#7dffb3;background:rgba(125,255,179,0.1);color:#7dffb3;}
+.mp-btn.green:hover{background:rgba(125,255,179,0.2);}
+.mp-toggle{display:flex;align-items:center;gap:10px;font-size:12px;color:rgba(240,230,200,0.6);}
+.mp-toggle input{width:18px;height:18px;cursor:pointer;accent-color:#d4af37;}
+.mp-error{color:#ff8080;font-size:11px;min-height:16px;}
+.mp-room-wrap{background:rgba(0,0,0,0.2);border:1px solid rgba(212,175,55,0.2);border-radius:10px;padding:20px;margin-top:8px;}
+.mp-room-code{font-family:'Playfair Display',serif;font-size:36px;color:#d4af37;text-align:center;letter-spacing:8px;margin-bottom:4px;}
+.mp-room-sub{text-align:center;font-size:10px;color:rgba(240,230,200,0.3);letter-spacing:2px;margin-bottom:16px;}
+.mp-room-game{text-align:center;font-size:12px;color:rgba(240,230,200,0.5);margin-bottom:16px;letter-spacing:1px;}
+.mp-players-list{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.mp-player-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:6px;background:rgba(255,255,255,0.04);}
+.mp-player-avatar{width:32px;height:32px;border-radius:50%;background:rgba(212,175,55,0.2);border:1px solid rgba(212,175,55,0.3);display:flex;align-items:center;justify-content:center;font-size:13px;color:#d4af37;font-family:'Playfair Display',serif;}
+.mp-player-name{flex:1;font-size:13px;color:#f0e6c8;}
+.mp-player-tag{font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:rgba(212,175,55,0.15);color:#d4af37;}
+.mp-player-tag.you{background:rgba(125,255,179,0.15);color:#7dffb3;}
+.mp-slots{text-align:center;font-size:11px;color:rgba(240,230,200,0.3);letter-spacing:1px;margin-bottom:12px;}
+.mp-public-rooms{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
+.mp-public-room-row{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid rgba(212,175,55,0.15);border-radius:8px;background:rgba(0,0,0,0.2);cursor:pointer;transition:border-color 0.15s;}
+.mp-public-room-row:hover{border-color:rgba(212,175,55,0.5);}
+.mp-public-room-game{font-family:'Playfair Display',serif;font-size:16px;color:#d4af37;min-width:60px;}
+.mp-public-room-info{flex:1;}
+.mp-public-room-code{font-size:11px;color:rgba(240,230,200,0.4);letter-spacing:2px;}
+.mp-public-room-players{font-size:11px;color:rgba(125,255,179,0.7);}
+.mp-public-room-join{font-size:10px;letter-spacing:2px;color:#d4af37;text-transform:uppercase;}
+.mp-loading{text-align:center;color:rgba(240,230,200,0.3);font-size:11px;letter-spacing:2px;padding:20px;}
+.mp-chat{margin-top:14px;border:1px solid rgba(255,255,255,0.06);border-radius:6px;overflow:hidden;}
+.mp-chat-log{max-height:100px;overflow-y:auto;padding:8px 10px;}
+.mp-chat-line{font-size:10px;color:rgba(240,230,200,0.5);padding:2px 0;line-height:1.5;}
+.mp-chat-line .mp-chat-name{color:#d4af37;}
+.mp-chat-input-row{display:flex;border-top:1px solid rgba(255,255,255,0.06);}
+.mp-chat-input{flex:1;background:none;border:none;padding:8px 10px;font-family:'DM Mono',monospace;font-size:11px;color:#f0e6c8;outline:none;}
+.mp-chat-send{background:none;border:none;border-left:1px solid rgba(255,255,255,0.06);padding:8px 12px;color:rgba(212,175,55,0.6);cursor:pointer;font-size:12px;}
+.mp-chat-send:hover{color:#d4af37;}
+
 /* POKER */
 .pk-table-wrap{background:radial-gradient(ellipse at center,#1a5c3a 0%,#0d4a2a 100%);border:3px solid #5a3a1a;border-radius:20px;padding:18px;margin-bottom:16px;position:relative;}
 .pk-community{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;min-height:100px;align-items:center;}
@@ -265,6 +316,7 @@ hr.divider{border:none;border-top:1px solid rgba(212,175,55,0.12);margin:18px 0;
       <div class="home-user-info">Playing as <span id="home-username">&#8212;</span></div>
       <div class="home-user-info">&#9651; <span id="home-chips" class="chips">1,000</span> chips</div>
       <button class="leaderboard-btn" onclick="openLeaderboard()">&#9733; Leaderboard</button>
+      <button class="multiplayer-btn" onclick="showScreen('screen-mp')">&#9776; Multiplayer</button>
       <button class="logout-btn" onclick="logout()">Sign Out</button>
     </div>
     <div class="game-grid">
@@ -447,6 +499,84 @@ hr.divider{border:none;border-top:1px solid rgba(212,175,55,0.12);margin:18px 0;
 </div>
 
 
+
+<!-- ══ MULTIPLAYER ══ -->
+<div id="screen-mp" class="screen">
+  <div class="felt">
+    <div class="table-area">
+      <button class="back-btn" onclick="showScreen('screen-home')">&#8592; Back to Games</button>
+      <h1>Multiplayer</h1>
+      <div class="subtitle">Play with friends or find a public match</div>
+
+      <div class="mp-section">
+        <div class="mp-tabs">
+          <button class="mp-tab active" onclick="mpTab('create')">Create Room</button>
+          <button class="mp-tab" onclick="mpTab('join')">Join by Code</button>
+          <button class="mp-tab" onclick="mpTab('browse');mpLoadPublic()">Browse</button>
+        </div>
+
+        <!-- CREATE -->
+        <div class="mp-panel active" id="mp-panel-create">
+          <div class="mp-form">
+            <div>
+              <div class="mp-label">Game</div>
+              <select class="mp-select" id="mp-create-game">
+                <option value="blackjack">Blackjack</option>
+                <option value="gin_rummy">Gin Rummy</option>
+                <option value="i_doubt_it">I Doubt It</option>
+                <option value="poker">Texas Hold'em</option>
+              </select>
+            </div>
+            <div class="mp-toggle">
+              <input type="checkbox" id="mp-public-check"/>
+              <label for="mp-public-check">Make room public (anyone can join)</label>
+            </div>
+            <div class="mp-error" id="mp-create-error"></div>
+            <button class="mp-btn" onclick="mpCreate()">Create Room</button>
+          </div>
+        </div>
+
+        <!-- JOIN -->
+        <div class="mp-panel" id="mp-panel-join">
+          <div class="mp-form">
+            <div>
+              <div class="mp-label">Room Code</div>
+              <input class="mp-input" id="mp-join-code" placeholder="Enter 6-letter code" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:18px;text-align:center;"/>
+            </div>
+            <div class="mp-error" id="mp-join-error"></div>
+            <button class="mp-btn" onclick="mpJoin()">Join Room</button>
+          </div>
+        </div>
+
+        <!-- BROWSE -->
+        <div class="mp-panel" id="mp-panel-browse">
+          <div class="mp-public-rooms" id="mp-public-rooms">
+            <div class="mp-loading">Loading rooms...</div>
+          </div>
+        </div>
+
+        <!-- ROOM LOBBY (shown once in a room) -->
+        <div class="mp-room-wrap" id="mp-room-wrap" style="display:none">
+          <div class="mp-room-code" id="mp-room-code">------</div>
+          <div class="mp-room-sub">Share this code with friends</div>
+          <div class="mp-room-game" id="mp-room-game"></div>
+          <div class="mp-players-list" id="mp-players-list"></div>
+          <div class="mp-slots" id="mp-slots"></div>
+          <button class="mp-btn green" id="mp-start-btn" onclick="mpStart()" style="display:none">Start Game</button>
+          <div class="mp-error" id="mp-room-error"></div>
+          <div class="mp-chat" id="mp-chat">
+            <div class="mp-chat-log" id="mp-chat-log"></div>
+            <div class="mp-chat-input-row">
+              <input class="mp-chat-input" id="mp-chat-input" placeholder="Say something..." maxlength="100"/>
+              <button class="mp-chat-send" onclick="mpSendChat()">&#9654;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ POKER ══ -->
 <div id="screen-poker" class="screen">
   <div class="felt">
@@ -606,12 +736,12 @@ hr.divider{border:none;border-top:1px solid rgba(212,175,55,0.12);margin:18px 0;
     <h2>What's New</h2>
     <div class="update-entry">
       <div class="update-header">
-        <span class="update-version">v2.2</span>
+        <span class="update-version">v3</span>
         <span class="update-date">May 2026</span>
         <div class="update-tags"><span class="update-tag tag-new">New</span></div>
       </div>
       <ul class="update-items">
-        <li>Added Texsas hold'em</li>
+        <li>Introduced Multiplayer across all games</li>
       </ul>
     </div>
     <div class="update-entry">
@@ -1591,6 +1721,239 @@ function pkEval5(cards){
 function pkMsg(t,cls){const b=document.getElementById('pk-message-box');b.textContent=t;b.className='message-box msg-'+cls;b.style.display='block';}
 function pkHideMsg(){document.getElementById('pk-message-box').style.display='none';}
 function pkHint(t){const el=document.getElementById('pk-hint');if(el)el.textContent=t;}
+
+
+// ══════════════════ MULTIPLAYER ══════════════════
+let mpRoom = null;       // current room object
+let mpPusher = null;     // pusher instance
+let mpChannel = null;    // pusher channel
+
+let PUSHER_KEY = '', PUSHER_CLUSTER = '';
+// Fetch public config from server
+(async () => {
+  try {
+    const r = await fetch('/api/config');
+    const d = await r.json();
+    PUSHER_KEY = d.pusherKey || '';
+    PUSHER_CLUSTER = d.pusherCluster || '';
+  } catch(e) { console.warn('Could not load config'); }
+})();
+
+const MP_GAME_LABELS = {
+  blackjack: 'Blackjack',
+  gin_rummy: 'Gin Rummy',
+  i_doubt_it: 'I Doubt It',
+  poker: "Texas Hold'em",
+};
+
+function mpTab(name) {
+  document.querySelectorAll('.mp-tab').forEach((t, i) => {
+    t.classList.toggle('active', ['create','join','browse'][i] === name);
+  });
+  document.querySelectorAll('.mp-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('mp-panel-' + name).classList.add('active');
+}
+
+function mpShowRoom(room) {
+  mpRoom = room;
+  document.getElementById('mp-room-wrap').style.display = 'block';
+  document.getElementById('mp-room-code').textContent = room.code;
+  document.getElementById('mp-room-game').textContent = MP_GAME_LABELS[room.game] || room.game;
+  mpRenderPlayers(JSON.parse(typeof room.players === 'string' ? room.players : JSON.stringify(room.players)));
+  // Subscribe to Pusher channel
+  mpSubscribe(room.code);
+}
+
+function mpRenderPlayers(players) {
+  const list = document.getElementById('mp-players-list');
+  list.innerHTML = '';
+  const maxP = mpRoom ? mpRoom.max_players : 4;
+  players.forEach(p => {
+    const row = document.createElement('div');
+    row.className = 'mp-player-row';
+    const isYou = currentUser && p.user_id === currentUser.id;
+    const isHost = mpRoom && p.user_id === mpRoom.host_id;
+    row.innerHTML = '<div class="mp-player-avatar">' + p.username[0].toUpperCase() + '</div>'
+      + '<div class="mp-player-name">' + p.username + '</div>'
+      + '<div class="mp-player-tag' + (isYou ? ' you' : '') + '">' + (isHost ? 'Host' : isYou ? 'You' : 'Player') + '</div>';
+    list.appendChild(row);
+  });
+  document.getElementById('mp-slots').textContent = players.length + ' / ' + maxP + ' players';
+  // Show start button only if host and enough players
+  const isHost = currentUser && mpRoom && mpRoom.host_id === currentUser.id;
+  const startBtn = document.getElementById('mp-start-btn');
+  startBtn.style.display = (isHost && players.length >= 2) ? 'block' : 'none';
+}
+
+function mpSubscribe(code) {
+  if (!mpPusher) {
+    mpPusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
+  }
+  if (mpChannel) mpChannel.unbind_all();
+  mpChannel = mpPusher.subscribe('room-' + code);
+
+  mpChannel.bind('player-joined', data => {
+    mpRenderPlayers(data.players);
+    mpAddChat('System', data.username + ' joined the room!');
+  });
+
+  mpChannel.bind('game-started', data => {
+    mpAddChat('System', 'Game is starting!');
+    setTimeout(() => mpLaunchGame(data), 800);
+  });
+
+  mpChannel.bind('game-action', data => {
+    mpHandleAction(data);
+  });
+
+  mpChannel.bind('chat', data => {
+    mpAddChat(data.username, data.message);
+  });
+}
+
+async function mpCreate() {
+  const game = document.getElementById('mp-create-game').value;
+  const isPublic = document.getElementById('mp-public-check').checked;
+  const errEl = document.getElementById('mp-create-error');
+  errEl.textContent = '';
+  if (!currentUser) { errEl.textContent = 'You must be signed in.'; return; }
+  try {
+    const res = await fetch('/api/room-create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: currentUser.id, username: currentUser.username, game, public: isPublic }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error || 'Failed to create room'; return; }
+    mpShowRoom(data.room);
+  } catch(e) { errEl.textContent = 'Connection error.'; }
+}
+
+async function mpJoin() {
+  const code = document.getElementById('mp-join-code').value.trim().toUpperCase();
+  const errEl = document.getElementById('mp-join-error');
+  errEl.textContent = '';
+  if (!code || code.length < 4) { errEl.textContent = 'Enter a valid room code.'; return; }
+  if (!currentUser) { errEl.textContent = 'You must be signed in.'; return; }
+  try {
+    const res = await fetch('/api/room-join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, user_id: currentUser.id, username: currentUser.username }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error || 'Failed to join room'; return; }
+    mpShowRoom(data.room);
+  } catch(e) { errEl.textContent = 'Connection error.'; }
+}
+
+async function mpLoadPublic() {
+  const el = document.getElementById('mp-public-rooms');
+  el.innerHTML = '<div class="mp-loading">Loading rooms...</div>';
+  try {
+    const res = await fetch('/api/room-list');
+    const data = await res.json();
+    if (!res.ok || !data.rooms) { el.innerHTML = '<div class="mp-loading">Failed to load rooms.</div>'; return; }
+    if (data.rooms.length === 0) { el.innerHTML = '<div class="mp-loading">No public rooms open right now.</div>'; return; }
+    el.innerHTML = '';
+    data.rooms.forEach(room => {
+      const row = document.createElement('div');
+      row.className = 'mp-public-room-row';
+      row.innerHTML = '<div class="mp-public-room-game">' + (MP_GAME_LABELS[room.game] || room.game) + '</div>'
+        + '<div class="mp-public-room-info">'
+        + '<div class="mp-public-room-code">' + room.code + '</div>'
+        + '<div class="mp-public-room-players">' + room.players.length + ' / ' + room.max_players + ' players</div>'
+        + '</div>'
+        + '<div class="mp-public-room-join">Join &#8594;</div>';
+      row.onclick = () => {
+        document.getElementById('mp-join-code').value = room.code;
+        mpTab('join');
+        mpJoin();
+      };
+      el.appendChild(row);
+    });
+  } catch(e) { el.innerHTML = '<div class="mp-loading">Connection error.</div>'; }
+}
+
+async function mpStart() {
+  if (!mpRoom || !currentUser) return;
+  const errEl = document.getElementById('mp-room-error');
+  errEl.textContent = '';
+  try {
+    const res = await fetch('/api/room-start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: mpRoom.code, user_id: currentUser.id, initial_state: {} }),
+    });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error || 'Failed to start game'; return; }
+  } catch(e) { errEl.textContent = 'Connection error.'; }
+}
+
+function mpLaunchGame(data) {
+  if (!mpRoom) return;
+  const game = mpRoom.game;
+  const players = data.players;
+  // Hide lobby
+  document.getElementById('mp-room-wrap').style.display = 'none';
+  // Launch the appropriate game in multiplayer mode
+  if (game === 'blackjack') { showScreen('screen-bj'); bjSyncChips(); mpHint('bj', players); }
+  else if (game === 'gin_rummy') { showScreen('screen-gr'); grInit(); mpHint('gr', players); }
+  else if (game === 'i_doubt_it') { showScreen('screen-idt'); idtInit(); mpHint('idt', players); }
+  else if (game === 'poker') { showScreen('screen-poker'); pkInit(); mpHint('pk', players); }
+}
+
+function mpHint(prefix, players) {
+  const names = players.map(p => p.username).join(', ');
+  const el = document.getElementById(prefix + '-hint');
+  if (el) el.textContent = 'Multiplayer game with: ' + names;
+}
+
+async function mpSendAction(action, payload) {
+  if (!mpRoom || !currentUser) return;
+  try {
+    await fetch('/api/room-action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: mpRoom.code, user_id: currentUser.id, action, payload }),
+    });
+  } catch(e) { console.warn('Could not send action:', e); }
+}
+
+function mpHandleAction(data) {
+  // Sync game state when another player makes a move
+  if (data.payload && data.payload.state) {
+    console.log('Received game state update from', data.user_id);
+  }
+}
+
+function mpAddChat(name, message) {
+  const log = document.getElementById('mp-chat-log');
+  if (!log) return;
+  const line = document.createElement('div');
+  line.className = 'mp-chat-line';
+  const nameSpan = document.createElement('span');
+  nameSpan.className = 'mp-chat-name';
+  nameSpan.textContent = name + ': ';
+  line.appendChild(nameSpan);
+  line.appendChild(document.createTextNode(message));
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+async function mpSendChat() {
+  const input = document.getElementById('mp-chat-input');
+  const message = input.value.trim();
+  if (!message || !mpRoom || !currentUser) return;
+  input.value = '';
+  mpAddChat(currentUser.username, message);
+  await mpSendAction('chat', { message, username: currentUser.username });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const chatInput = document.getElementById('mp-chat-input');
+  if (chatInput) chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') mpSendChat(); });
+});
 
 </script>
 </body>
