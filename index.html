@@ -736,16 +736,6 @@ hr.divider{border:none;border-top:1px solid rgba(212,175,55,0.12);margin:18px 0;
     <h2>What's New</h2>
     <div class="update-entry">
       <div class="update-header">
-        <span class="update-version">v3</span>
-        <span class="update-date">May 2026</span>
-        <div class="update-tags"><span class="update-tag tag-new">New</span></div>
-      </div>
-      <ul class="update-items">
-        <li>Introduced Multiplayer across all games</li>
-      </ul>
-    </div>
-    <div class="update-entry">
-      <div class="update-header">
         <span class="update-version">v2.1</span>
         <span class="update-date">May 2026</span>
         <div class="update-tags"><span class="update-tag tag-new">New</span><span class="update-tag tag-fix">Fix</span></div>
@@ -1723,6 +1713,409 @@ function pkHideMsg(){document.getElementById('pk-message-box').style.display='no
 function pkHint(t){const el=document.getElementById('pk-hint');if(el)el.textContent=t;}
 
 
+
+// ══════════════════ POKER MULTIPLAYER EXTENSION ══════════════════
+let pkMpPlayers = [];   // [{user_id, username, chips, bet, folded, ready}]
+let pkMpIsHost = false;
+let pkMpMyId = '';
+let pkMpCode = '';
+let pkMpHoleCards = []; // my private hole cards
+let pkMpChannel = null;
+let pkMpState = {};     // shared public game state
+
+function pkInitMultiplayer(players) {
+  if (!mpRoom || !currentUser) return;
+  pkMpCode = mpRoom.code;
+  pkMpMyId = currentUser.id;
+  pkMpIsHost = mpRoom.host_id === currentUser.id;
+  pkMpPlayers = players.map(p => ({
+    ...p,
+    chips: p.chips || 1000,
+    bet: 0,
+    folded: false,
+  }));
+  pkMpHoleCards = [];
+  pkMpState = {};
+
+  // Subscribe to poker-specific Pusher events
+  if (mpChannel) {
+    mpChannel.bind('poker-state', data => pkMpHandleState(data.state));
+    mpChannel.bind('poker-action', data => pkMpHandlePlayerAction(data));
+    mpChannel.bind('poker-showdown', data => pkMpHandleShowdown(data));
+    mpChannel.bind('poker-hole-' + pkMpMyId, data => {
+      pkMpHoleCards = data.cards;
+      pkMpRenderYourCards();
+    });
+    mpChannel.bind('chat', data => mpAddChat(data.username, data.message));
+  }
+
+  pkMpRender();
+  pkHideMsg();
+
+  if (pkMpIsHost) {
+    pkHint('You are the host. Press Deal Hand to start!');
+    document.getElementById('pk-deal-btn').disabled = false;
+    // Override deal button for multiplayer
+    document.getElementById('pk-deal-btn').onclick = pkMpDeal;
+  } else {
+    pkHint('Waiting for host to deal...');
+    document.getElementById('pk-deal-btn').disabled = true;
+  }
+  pkMpSetActionBtns(false);
+}
+
+function pkMpRender() {
+  // Players row
+  const pRow = document.getElementById('pk-players-row');
+  pRow.innerHTML = '';
+  pkMpPlayers.forEach((p, i) => {
+    const isMe = p.user_id === pkMpMyId;
+    const isActive = pkMpState.currentPlayerIdx === i;
+    const box = document.createElement('div');
+    box.className = 'pk-player-box' + (isActive ? ' active' : '') + (p.folded ? ' folded' : '');
+    const nm = document.createElement('div'); nm.className = 'pk-player-name';
+    nm.textContent = (isActive ? '▶ ' : '') + p.username + (isMe ? ' (you)' : '') + (i === pkMpState.dealer ? ' [D]' : '');
+    const ch = document.createElement('div'); ch.className = 'pk-player-chips';
+    ch.textContent = (p.chips || 0).toLocaleString() + ' chips';
+    const bt = document.createElement('div'); bt.className = 'pk-player-bet';
+    bt.textContent = p.bet > 0 ? 'Bet: ' + p.bet : '';
+    const cards = document.createElement('div'); cards.className = 'pk-player-cards';
+    if (!p.folded) {
+      // Show face-down cards for others, face-up for me (handled separately)
+      if (!isMe) {
+        cards.appendChild(pkMakeCard(null, false, true));
+        cards.appendChild(pkMakeCard(null, false, true));
+      }
+    }
+    box.appendChild(nm); box.appendChild(ch); box.appendChild(bt); box.appendChild(cards);
+    pRow.appendChild(box);
+  });
+
+  // Community cards
+  const commEl = document.getElementById('pk-community');
+  commEl.innerHTML = '';
+  const shown = pkMpState.phase === 0 ? 0 : pkMpState.phase === 1 ? 3 : pkMpState.phase === 2 ? 4 : 5;
+  const comm = pkMpState.community || [];
+  for (let i = 0; i < 5; i++) {
+    if (i < shown && comm[i]) commEl.appendChild(pkMakeCard(comm[i], true, false));
+    else { const b = document.createElement('div'); b.className = 'pk-card pk-card-lg hidden'; commEl.appendChild(b); }
+  }
+
+  document.getElementById('pk-phase-label').textContent = PK_PHASES[Math.min(pkMpState.phase || 0, 4)];
+  document.getElementById('pk-pot').textContent = (pkMpState.pot || 0).toLocaleString();
+  document.getElementById('pk-chips').textContent = (pkMpPlayers.find(p => p.user_id === pkMpMyId)?.chips || 0).toLocaleString();
+}
+
+function pkMpRenderYourCards() {
+  const el = document.getElementById('pk-your-cards');
+  el.innerHTML = '';
+  pkMpHoleCards.forEach(c => el.appendChild(pkMakeCard(c, true, false)));
+  // Show hand strength if community cards visible
+  const comm = (pkMpState.community || []).slice(0, pkMpState.phase === 1 ? 3 : pkMpState.phase === 2 ? 4 : pkMpState.phase >= 3 ? 5 : 0);
+  if (pkMpHoleCards.length === 2 && comm.length > 0) {
+    const best = pkBestHand([...pkMpHoleCards, ...comm]);
+    document.getElementById('pk-hand-strength').textContent = PK_HAND_RANKS[best.rank];
+  }
+}
+
+function pkMpSetActionBtns(myTurn) {
+  document.getElementById('pk-fold-btn').disabled = !myTurn;
+  document.getElementById('pk-check-btn').disabled = !myTurn;
+  document.getElementById('pk-call-btn').disabled = !myTurn;
+  document.getElementById('pk-raise-btn').disabled = !myTurn;
+  if (myTurn) {
+    document.getElementById('pk-fold-btn').onclick = pkMpFold;
+    document.getElementById('pk-check-btn').onclick = pkMpCheck;
+    document.getElementById('pk-call-btn').onclick = pkMpCall;
+    document.getElementById('pk-raise-btn').onclick = pkMpRaiseAction;
+  }
+}
+
+// Host deals: build full deck, assign hole cards, broadcast
+async function pkMpDeal() {
+  if (!pkMpIsHost) return;
+  const deck = shuffle(buildDeck());
+  const holes = {};
+  pkMpPlayers.forEach((p, i) => {
+    holes[p.user_id] = [deck.pop(), deck.pop()];
+  });
+  const community = [deck.pop(), deck.pop(), deck.pop(), deck.pop(), deck.pop()];
+
+  // Reset player states
+  const sbIdx = (pkMpState.dealer !== undefined ? pkMpState.dealer + 1 : 0) % pkMpPlayers.length;
+  const bbIdx = (sbIdx + 1) % pkMpPlayers.length;
+  pkMpPlayers.forEach(p => { p.bet = 0; p.folded = false; });
+  const stacks = {};
+  pkMpPlayers.forEach(p => stacks[p.user_id] = p.chips);
+
+  // Post blinds
+  pkMpPlayers[sbIdx].chips = Math.max(0, pkMpPlayers[sbIdx].chips - PK_SB);
+  pkMpPlayers[sbIdx].bet = PK_SB;
+  pkMpPlayers[bbIdx].chips = Math.max(0, pkMpPlayers[bbIdx].chips - PK_BB);
+  pkMpPlayers[bbIdx].bet = PK_BB;
+  const pot = PK_SB + PK_BB;
+  const firstToAct = (bbIdx + 1) % pkMpPlayers.length;
+
+  const publicState = {
+    phase: 0,
+    community,
+    pot,
+    currentBet: PK_BB,
+    currentPlayerIdx: firstToAct,
+    dealer: sbIdx === 0 ? pkMpPlayers.length - 1 : sbIdx - 1,
+    players: pkMpPlayers.map(p => ({ user_id: p.user_id, username: p.username, chips: p.chips, bet: p.bet, folded: p.folded })),
+    acted: pkMpPlayers.map(() => false),
+    lastRaiser: bbIdx,
+  };
+
+  try {
+    await fetch('/api/poker-action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code: pkMpCode,
+        user_id: pkMpMyId,
+        action: 'deal',
+        payload: { publicState, privateCards: holes },
+      }),
+    });
+  } catch(e) { pkHint('Connection error dealing cards.'); }
+}
+
+function pkMpHandleState(state) {
+  pkMpState = state;
+  // Sync player data from state
+  if (state.players) {
+    state.players.forEach(sp => {
+      const local = pkMpPlayers.find(p => p.user_id === sp.user_id);
+      if (local) { local.chips = sp.chips; local.bet = sp.bet; local.folded = sp.folded; }
+    });
+  }
+  pkMpRender();
+  pkMpRenderYourCards();
+
+  // Is it my turn?
+  const myIdx = pkMpPlayers.findIndex(p => p.user_id === pkMpMyId);
+  const isMyTurn = state.currentPlayerIdx === myIdx && !pkMpPlayers[myIdx]?.folded;
+
+  if (isMyTurn) {
+    const toCall = (state.currentBet || 0) - (pkMpPlayers[myIdx]?.bet || 0);
+    pkHint('Your turn! ' + (toCall > 0 ? 'Call ' + toCall + ' or raise/fold.' : 'Check or raise.'));
+    document.getElementById('pk-call-btn').textContent = toCall > 0 ? 'Call ' + toCall : 'Call';
+    pkMpSetActionBtns(true);
+  } else {
+    const current = pkMpPlayers[state.currentPlayerIdx];
+    pkHint(current ? current.username + "'s turn..." : 'Waiting...');
+    pkMpSetActionBtns(false);
+    // If host and it's an AI slot (shouldn't happen in multiplayer), skip
+  }
+
+  document.getElementById('pk-deal-btn').disabled = true;
+}
+
+async function pkMpSendAction(action, amount) {
+  const me = pkMpPlayers.find(p => p.user_id === pkMpMyId);
+  try {
+    await fetch('/api/poker-action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code: pkMpCode,
+        user_id: pkMpMyId,
+        action: 'player-action',
+        payload: { action, amount, username: me?.username },
+      }),
+    });
+  } catch(e) { console.warn('Could not send action'); }
+}
+
+function pkMpHandlePlayerAction(data) {
+  const idx = pkMpPlayers.findIndex(p => p.user_id === data.user_id);
+  if (idx === -1) return;
+  const p = pkMpPlayers[idx];
+  const state = pkMpState;
+
+  if (data.action === 'fold') {
+    p.folded = true;
+    pkMpAddLog(data.username + ' folds.');
+  } else if (data.action === 'check') {
+    pkMpAddLog(data.username + ' checks.');
+  } else if (data.action === 'call') {
+    const toCall = Math.min((state.currentBet || 0) - p.bet, p.chips);
+    p.chips -= toCall; p.bet += toCall; state.pot += toCall;
+    pkMpAddLog(data.username + ' calls ' + toCall + '.');
+  } else if (data.action === 'raise') {
+    const toCall = (state.currentBet || 0) - p.bet;
+    const total = Math.min(toCall + (data.amount || PK_BB), p.chips);
+    p.chips -= total; p.bet += total; state.pot += total;
+    state.currentBet = p.bet;
+    pkMpAddLog(data.username + ' raises to ' + p.bet + '.');
+  }
+
+  state.acted = state.acted || pkMpPlayers.map(() => false);
+  state.acted[idx] = true;
+
+  // If host, advance game state
+  if (pkMpIsHost) pkMpHostAdvance(data.action, idx);
+  else pkMpRender();
+}
+
+async function pkMpHostAdvance(lastAction, lastIdx) {
+  const state = pkMpState;
+  const activePlayers = pkMpPlayers.filter(p => !p.folded);
+
+  if (activePlayers.length <= 1) { pkMpDoShowdown(); return; }
+
+  // Check if betting round over
+  const allActed = pkMpPlayers.every((p, i) => p.folded || (state.acted && state.acted[i]));
+  const allEqual = pkMpPlayers.filter(p => !p.folded).every(p => p.bet === state.currentBet || p.chips === 0);
+
+  if (allActed && allEqual) {
+    // Advance phase
+    state.phase = (state.phase || 0) + 1;
+    pkMpPlayers.forEach(p => { state.pot += 0; p.bet = 0; }); // bets already in pot
+    state.currentBet = 0;
+    state.acted = pkMpPlayers.map(() => false);
+    if (state.phase >= 4) { pkMpDoShowdown(); return; }
+    // First to act is left of dealer
+    let next = ((state.dealer || 0) + 1) % pkMpPlayers.length;
+    while (pkMpPlayers[next].folded) next = (next + 1) % pkMpPlayers.length;
+    state.currentPlayerIdx = next;
+    state.players = pkMpPlayers.map(p => ({ user_id: p.user_id, username: p.username, chips: p.chips, bet: p.bet, folded: p.folded }));
+    await pkMpBroadcastState();
+    return;
+  }
+
+  // Find next active player
+  let next = (lastIdx + 1) % pkMpPlayers.length;
+  let laps = 0;
+  while ((pkMpPlayers[next].folded || pkMpPlayers[next].chips === 0) && laps < pkMpPlayers.length) {
+    next = (next + 1) % pkMpPlayers.length; laps++;
+  }
+  state.currentPlayerIdx = next;
+  state.players = pkMpPlayers.map(p => ({ user_id: p.user_id, username: p.username, chips: p.chips, bet: p.bet, folded: p.folded }));
+  await pkMpBroadcastState();
+}
+
+async function pkMpBroadcastState() {
+  pkMpState.players = pkMpPlayers.map(p => ({ user_id: p.user_id, username: p.username, chips: p.chips, bet: p.bet, folded: p.folded }));
+  pkMpRender();
+  try {
+    await fetch('/api/poker-action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code: pkMpCode,
+        user_id: pkMpMyId,
+        action: 'state-update',
+        payload: { state: pkMpState },
+      }),
+    });
+  } catch(e) { console.warn('Could not broadcast state'); }
+}
+
+async function pkMpDoShowdown() {
+  const alive = pkMpPlayers.filter(p => !p.folded);
+  let winnerData;
+  if (alive.length === 1) {
+    winnerData = { winner: alive[0].user_id, winnerName: alive[0].username, handName: 'Last player standing', pot: pkMpState.pot };
+    alive[0].chips += pkMpState.pot;
+  } else {
+    const comm = pkMpState.community || [];
+    let bestRank = -1, winner = null;
+    alive.forEach(p => {
+      if (!pkMpHolesMap) return;
+      const hole = pkMpHolesMap[p.user_id];
+      if (!hole) return;
+      const { rank } = pkBestHand([...hole, ...comm]);
+      if (rank > bestRank) { bestRank = rank; winner = p; }
+    });
+    if (!winner) winner = alive[0];
+    winner.chips += pkMpState.pot;
+    winnerData = { winner: winner.user_id, winnerName: winner.username, handName: PK_HAND_RANKS[bestRank] || 'Best hand', pot: pkMpState.pot, revealHoles: pkMpHolesMap };
+  }
+  // Rotate dealer
+  pkMpState.dealer = ((pkMpState.dealer || 0) + 1) % pkMpPlayers.length;
+  pkMpState.pot = 0;
+  pkMpState.phase = 0;
+  pkMpState.currentPlayerIdx = -1;
+  // Save chips to DB
+  for (const p of pkMpPlayers) {
+    if (p.user_id === currentUser?.id) {
+      currentUser.chips = p.chips;
+      await saveChips('poker_mp', p.user_id === winnerData.winner ? 'win' : 'lose', p.user_id === winnerData.winner ? winnerData.pot : -p.bet);
+    }
+  }
+  try {
+    await fetch('/api/poker-action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: pkMpCode, user_id: pkMpMyId, action: 'showdown', payload: winnerData }),
+    });
+  } catch(e) {}
+  pkMpHandleShowdown(winnerData);
+}
+
+let pkMpHolesMap = {}; // host keeps track of all hole cards
+
+function pkMpHandleShowdown(data) {
+  pkMpRender();
+  pkMpSetActionBtns(false);
+  const isWinner = data.winner === pkMpMyId;
+  pkMsg((isWinner ? '🏆 You win ' : data.winnerName + ' wins ') + data.pot + ' chips with ' + data.handName + '!', isWinner ? 'win' : 'lose');
+  pkMpAddLog((isWinner ? 'You' : data.winnerName) + ' win ' + data.pot + ' chips — ' + data.handName);
+  document.getElementById('pk-chips').textContent = (pkMpPlayers.find(p=>p.user_id===pkMpMyId)?.chips||0).toLocaleString();
+  if (pkMpIsHost) {
+    setTimeout(() => {
+      pkHideMsg();
+      document.getElementById('pk-deal-btn').disabled = false;
+      document.getElementById('pk-deal-btn').onclick = pkMpDeal;
+      pkHint('Press Deal Hand for next round');
+    }, 3000);
+  } else {
+    pkHint('Waiting for host to deal next hand...');
+  }
+}
+
+// Player action senders
+async function pkMpFold() {
+  pkMpSetActionBtns(false);
+  const me = pkMpPlayers.find(p => p.user_id === pkMpMyId);
+  if (me) me.folded = true;
+  await pkMpSendAction('fold', 0);
+  if (pkMpIsHost) pkMpHandlePlayerAction({ user_id: pkMpMyId, action: 'fold', username: me?.username });
+}
+async function pkMpCheck() {
+  pkMpSetActionBtns(false);
+  const me = pkMpPlayers.find(p => p.user_id === pkMpMyId);
+  await pkMpSendAction('check', 0);
+  if (pkMpIsHost) pkMpHandlePlayerAction({ user_id: pkMpMyId, action: 'check', username: me?.username });
+}
+async function pkMpCall() {
+  pkMpSetActionBtns(false);
+  const me = pkMpPlayers.find(p => p.user_id === pkMpMyId);
+  const toCall = (pkMpState.currentBet || 0) - (me?.bet || 0);
+  await pkMpSendAction('call', toCall);
+  if (pkMpIsHost) pkMpHandlePlayerAction({ user_id: pkMpMyId, action: 'call', amount: toCall, username: me?.username });
+}
+async function pkMpRaiseAction() {
+  pkMpSetActionBtns(false);
+  const me = pkMpPlayers.find(p => p.user_id === pkMpMyId);
+  const amount = parseInt(document.getElementById('pk-raise-amt').value) || PK_BB;
+  await pkMpSendAction('raise', amount);
+  if (pkMpIsHost) pkMpHandlePlayerAction({ user_id: pkMpMyId, action: 'raise', amount, username: me?.username });
+}
+
+function pkMpAddLog(text) {
+  const el = document.getElementById('mp-chat-log');
+  if (!el) return;
+  const d = document.createElement('div');
+  d.className = 'mp-chat-line';
+  d.textContent = text;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+
 // ══════════════════ MULTIPLAYER ══════════════════
 let mpRoom = null;       // current room object
 let mpPusher = null;     // pusher instance
@@ -1894,13 +2287,11 @@ function mpLaunchGame(data) {
   if (!mpRoom) return;
   const game = mpRoom.game;
   const players = data.players;
-  // Hide lobby
   document.getElementById('mp-room-wrap').style.display = 'none';
-  // Launch the appropriate game in multiplayer mode
   if (game === 'blackjack') { showScreen('screen-bj'); bjSyncChips(); mpHint('bj', players); }
   else if (game === 'gin_rummy') { showScreen('screen-gr'); grInit(); mpHint('gr', players); }
   else if (game === 'i_doubt_it') { showScreen('screen-idt'); idtInit(); mpHint('idt', players); }
-  else if (game === 'poker') { showScreen('screen-poker'); pkInit(); mpHint('pk', players); }
+  else if (game === 'poker') { showScreen('screen-poker'); pkInitMultiplayer(data.players); }
 }
 
 function mpHint(prefix, players) {
