@@ -1445,7 +1445,10 @@ function pkSetBtns(myTurn){
   document.getElementById('pk-raise-btn').disabled=!myTurn;
   document.getElementById('pk-deal-btn').disabled=pkRunning;
 }
-
+function pkHandleDeal() {
+  if (mpRoom && mpRoom.game === 'poker') pkMpDeal();
+  else pkDeal();
+}
 function pkDeal(){
   if(pkRunning) return;
   // Bust check
