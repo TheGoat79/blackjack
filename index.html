@@ -1835,6 +1835,9 @@ function pkMpSetActionBtns(myTurn) {
 }
 
 // Host deals: build full deck, assign hole cards, broadcast
+  async function pkMpDeal() {
+  console.log('pkMpDeal called', { pkMpIsHost, pkMpCode, pkMpMyId, mpRoom });
+  if (!pkMpIsHost) return;
 async function pkMpDeal() {
   if (!pkMpIsHost) return;
   const deck = shuffle(buildDeck());
